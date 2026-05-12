@@ -31,6 +31,9 @@ public class MainMenuForm extends JFrame {
         // Button that opens the Search Patient screen.
         JButton btnSearchPatient = createButton("Search Patient");
 
+        // Button that opens the Add Doctor screen.
+        JButton btnAddDoctor = createButton("Add Doctor");
+
         // Button that opens the Book Appointment screen.
         JButton btnBookAppointment = createButton("Book Appointment");
 
@@ -46,10 +49,11 @@ public class MainMenuForm extends JFrame {
         btnExit.setForeground(Color.WHITE);
 
         // Panel that displays the main menu buttons.
-        JPanel buttonPanel = new JPanel(new GridLayout(6, 1, 15, 15));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 300, 120, 300));
+        JPanel buttonPanel = new JPanel(new GridLayout(7, 1, 15, 15));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 300, 90, 300));
         buttonPanel.add(btnAddPatient);
         buttonPanel.add(btnSearchPatient);
+        buttonPanel.add(btnAddDoctor);
         buttonPanel.add(btnBookAppointment);
         buttonPanel.add(btnViewDoctor);
         buttonPanel.add(btnPatientHistory);
@@ -66,6 +70,7 @@ public class MainMenuForm extends JFrame {
 
         btnAddPatient.addActionListener(event -> new AddPatientForm().setVisible(true));
         btnSearchPatient.addActionListener(event -> new SearchPatientForm().setVisible(true));
+        btnAddDoctor.addActionListener(event -> new AddDoctorForm().setVisible(true));
         btnBookAppointment.addActionListener(event -> new BookAppointmentForm().setVisible(true));
         btnViewDoctor.addActionListener(event -> new ViewAppointmentsForm().setVisible(true));
         btnPatientHistory.addActionListener(event -> new PatientHistoryForm().setVisible(true));

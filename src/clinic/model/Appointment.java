@@ -3,6 +3,7 @@ package clinic.model;
 // Stores one clinic appointment.
 public class Appointment {
     public static final String STATUS_SCHEDULED = "Scheduled";
+    public static final String STATUS_COMPLETED = "Completed";
     public static final String STATUS_CANCELLED = "Cancelled";
 
     private int appointmentId;

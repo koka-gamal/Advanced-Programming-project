@@ -13,10 +13,12 @@ public class DataStore {
 
     public static int nextPatientId = 1;
     public static int nextAppointmentId = 1;
+    public static int nextDoctorId = 6;
 
     private static final String DATA_DIR = "data";
     private static final String PATIENTS_FILE = DATA_DIR + "/patients.txt";
     private static final String APPOINTMENTS_FILE = DATA_DIR + "/appointments.txt";
+    private static final String DOCTORS_FILE = DATA_DIR + "/doctors.txt";
 
     static {
         loadDefaultDoctors();
@@ -39,10 +41,25 @@ public class DataStore {
     public static void saveData() {
         try {
             new File(DATA_DIR).mkdirs();
+            saveDoctors();
             savePatients();
             saveAppointments();
         } catch (IOException exception) {
             System.err.println("Error saving data: " + exception.getMessage());
+        }
+    }
+
+    // Writes doctor rows to the doctors text file.
+    private static void saveDoctors() throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DOCTORS_FILE))) {
+            writer.write("nextId=" + nextDoctorId);
+            writer.newLine();
+
+            for (Doctor doctor : doctors) {
+                writer.write(doctor.getId() + "|" + doctor.getName() + "|"
+                    + doctor.getSpecialization());
+                writer.newLine();
+            }
         }
     }
 
@@ -81,9 +98,50 @@ public class DataStore {
         appointments.clear();
         nextPatientId = 1;
         nextAppointmentId = 1;
+        nextDoctorId = 6;
 
+        loadDoctors();
         loadPatients();
         loadAppointments();
+    }
+
+    // Reads doctor records from the doctors text file.
+    private static void loadDoctors() {
+        File doctorFile = new File(DOCTORS_FILE);
+        if (!doctorFile.exists()) {
+            updateNextDoctorId();
+            return;
+        }
+
+        doctors.clear();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(doctorFile))) {
+            String line = reader.readLine();
+            if (line != null && line.startsWith("nextId=")) {
+                nextDoctorId = Integer.parseInt(line.split("=")[1]);
+            }
+
+            while ((line = reader.readLine()) != null) {
+                String[] fields = line.split("\\|", 3);
+                if (fields.length == 3) {
+                    doctors.add(new Doctor(
+                        Integer.parseInt(fields[0]),
+                        fields[1],
+                        fields[2]
+                    ));
+                }
+            }
+
+            if (doctors.isEmpty()) {
+                loadDefaultDoctors();
+                updateNextDoctorId();
+            }
+        } catch (IOException | NumberFormatException exception) {
+            System.err.println("Error loading doctors: " + exception.getMessage());
+            doctors.clear();
+            loadDefaultDoctors();
+            updateNextDoctorId();
+        }
     }
 
     // Reads patient records from the patients text file.
@@ -191,5 +249,28 @@ public class DataStore {
             }
         }
         return null;
+    }
+
+    // Finds a doctor by name and returns null when no match exists.
+    public static Doctor findDoctorByName(String name) {
+        for (Doctor doctor : doctors) {
+            if (doctor.getName().equalsIgnoreCase(name)) {
+                return doctor;
+            }
+        }
+        return null;
+    }
+
+    // Sets the next doctor ID after the largest doctor ID currently stored.
+    private static void updateNextDoctorId() {
+        int largestId = 0;
+
+        for (Doctor doctor : doctors) {
+            if (doctor.getId() > largestId) {
+                largestId = doctor.getId();
+            }
+        }
+
+        nextDoctorId = largestId + 1;
     }
 }

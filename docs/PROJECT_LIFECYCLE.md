@@ -11,12 +11,13 @@ and GUI forms.
 1. The program starts from `clinic.app.Main`.
 2. `MainMenuForm` opens and displays the main navigation buttons.
 3. The user adds patients through `AddPatientForm`.
-4. The user books appointments through `BookAppointmentForm`.
-5. Appointment data is stored in `DataStore.appointments`.
-6. The user views appointments by doctor through `ViewAppointmentsForm`.
-7. The user searches patient history through `PatientHistoryForm`.
-8. The user can cancel appointments from the patient history screen.
-9. `DataStore.saveData()` stores patient and appointment records in text files.
+4. The user adds doctors through `AddDoctorForm`.
+5. The user books appointments through `BookAppointmentForm`.
+6. Appointment data is stored in `DataStore.appointments`.
+7. The user views appointments by doctor through `ViewAppointmentsForm`.
+8. The user searches patient history through `PatientHistoryForm`.
+9. The user can complete or cancel appointments from appointment table screens.
+10. `DataStore.saveData()` stores patient, doctor, and appointment records in text files.
 
 ## Validation Lifecycle
 
@@ -36,16 +37,20 @@ and GUI forms.
 ### `clinic.data.DataStore`
 
 - `loadDefaultDoctors()`: Adds the fixed doctors used by the system.
-- `saveData()`: Saves patient and appointment data.
+- `saveData()`: Saves patient, doctor, and appointment data.
+- `saveDoctors()`: Writes doctor records to `doctors.txt`.
 - `savePatients()`: Writes patient records to `patients.txt`.
 - `saveAppointments()`: Writes appointment records to `appointments.txt`.
-- `loadData()`: Loads saved patient and appointment records.
+- `loadData()`: Loads saved patient, doctor, and appointment records.
+- `loadDoctors()`: Reads doctors from `doctors.txt`.
 - `loadPatients()`: Reads patients from `patients.txt`.
 - `loadAppointments()`: Reads appointments from `appointments.txt`.
 - `findPatientById(int id)`: Finds a patient by ID.
 - `getAppointmentsByDoctor(String doctorName)`: Returns appointments for one doctor.
 - `getAppointmentsByPatient(int patientId)`: Returns appointments for one patient.
 - `findAppointmentById(int appointmentId)`: Finds an appointment by ID.
+- `findDoctorByName(String name)`: Finds a doctor by name.
+- `updateNextDoctorId()`: Sets the next doctor ID after the largest stored ID.
 
 ### `clinic.model.Patient`
 
@@ -74,6 +79,12 @@ and GUI forms.
 - `addPatient()`: Validates and saves a patient.
 - `clearForm()`: Clears the patient input fields.
 
+### `clinic.ui.AddDoctorForm`
+
+- `AddDoctorForm()`: Builds the add doctor screen.
+- `addDoctor()`: Validates and saves a doctor.
+- `clearForm()`: Clears the doctor input fields.
+
 ### `clinic.ui.BookAppointmentForm`
 
 - `BookAppointmentForm()`: Builds the appointment booking screen.
@@ -94,12 +105,14 @@ and GUI forms.
 
 - `ViewAppointmentsForm()`: Builds the doctor appointments screen.
 - `loadAppointments()`: Loads appointments for the selected doctor.
+- `updateSelectedAppointment(String newStatus)`: Completes or cancels the selected appointment.
 
 ### `clinic.ui.PatientHistoryForm`
 
 - `PatientHistoryForm()`: Builds the patient history screen.
 - `searchAppointments()`: Searches appointments by patient ID.
-- `cancelAppointment()`: Changes the selected appointment status to `Cancelled`.
+- `loadPatientAppointments(int patientId, boolean showEmptyMessage)`: Loads appointment rows for one patient.
+- `updateSelectedAppointment(String newStatus)`: Completes or cancels the selected appointment.
 
 ## Final Testing Checklist
 
@@ -107,7 +120,9 @@ and GUI forms.
 - The main menu opens from `clinic.app.Main`.
 - Each GUI page opens at `1000x800`.
 - Patient creation validates empty fields and age input.
+- Doctor creation validates empty fields and duplicate names.
 - Appointment booking validates patient ID input.
 - Doctor appointments display in a table.
 - Patient history displays in a table.
+- Appointment completion updates the appointment status.
 - Appointment cancellation updates the appointment status.

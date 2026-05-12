@@ -2,9 +2,9 @@
 
 A Java Swing application for managing clinic patients and appointments.
 
-The system supports adding patients, booking appointments with predefined
-doctors, viewing appointments by doctor, searching patient history, and
-cancelling appointments.
+The system supports adding patients, adding doctors, booking appointments,
+viewing appointments by doctor, searching patient history, completing
+appointments, and cancelling appointments.
 
 ## Project Structure
 
@@ -23,6 +23,7 @@ Clinic Appointment System
 |       |   `-- Patient.java
 |       `-- ui/
 |           |-- AddPatientForm.java
+|           |-- AddDoctorForm.java
 |           |-- BookAppointmentForm.java
 |           |-- MainMenuForm.java
 |           |-- PatientHistoryForm.java
@@ -30,6 +31,7 @@ Clinic Appointment System
 |           `-- ViewAppointmentsForm.java
 |-- data/
 |   |-- appointments.txt
+|   |-- doctors.txt
 |   `-- patients.txt
 |-- docs/
 |   `-- PROJECT_LIFECYCLE.md
@@ -57,10 +59,12 @@ java -cp build\classes clinic.app.Main
 ## Main Features
 
 - Add a new patient with name, age, and contact.
+- Add a new doctor with name and specialization.
 - Search patients by name or contact.
 - Book an appointment using an existing patient ID.
 - View appointments for a selected doctor.
 - Search appointment history by patient ID.
+- Complete an appointment by changing its status to `Completed`.
 - Cancel an appointment by changing its status to `Cancelled`.
 
 ## Data Rules
@@ -69,5 +73,6 @@ java -cp build\classes clinic.app.Main
 - Doctors are stored in `DataStore.doctors`.
 - Appointments are stored in `DataStore.appointments`.
 - New appointments start with status `Scheduled`.
+- Completed appointments use status `Completed`.
 - Cancelled appointments use status `Cancelled`.
 - Text files in `data/` store records between runs.

@@ -7,7 +7,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
 
-// Screen used to search patient appointment history and cancel appointments.
+// Screen used to search patient appointment history and update appointments.
 public class PatientHistoryForm extends JFrame {
 
     // Input field displayed beside the Patient ID label.
@@ -16,14 +16,11 @@ public class PatientHistoryForm extends JFrame {
     // Button displayed in the top panel to search appointments.
     private JButton searchButton;
 
-    // Button displayed in the top panel to cancel the selected appointment.
-    private JButton cancelButton;
-
     // Table displayed in the center of the screen.
     private JTable appointmentTable;
     private DefaultTableModel tableModel;
 
-    // Builds the patient history window, search controls, and appointment table.
+    // Builds the patient history window, search controls, appointment table, and status buttons.
     public PatientHistoryForm() {
 
         // Window setup.
@@ -43,16 +40,13 @@ public class PatientHistoryForm extends JFrame {
         // Button displayed beside the patient ID field.
         searchButton = new JButton("Search");
 
-        // Button displayed beside the search button.
-        cancelButton = new JButton("Cancel Appointment");
-
         topPanel.add(patientIdLabel);
         topPanel.add(patientIdField);
         topPanel.add(searchButton);
-        topPanel.add(cancelButton);
 
         // Table columns displayed in the appointment results table.
         String[] columns = {
+            "Appt ID",
             "Patient ID",
             "Doctor",
             "Date",
@@ -60,18 +54,50 @@ public class PatientHistoryForm extends JFrame {
             "Status"
         };
 
-        tableModel = new DefaultTableModel(columns, 0);
+        tableModel = new DefaultTableModel(columns, 0) {
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
         appointmentTable = new JTable(tableModel);
+        appointmentTable.setRowHeight(28);
 
         // Scroll pane displayed around the appointment table.
         JScrollPane scrollPane = new JScrollPane(appointmentTable);
 
+        // Button that marks the selected appointment as Completed.
+        JButton completeButton = new JButton("Complete Appointment");
+
+        // Button that marks the selected appointment as Cancelled.
+        JButton cancelButton = new JButton("Cancel Appointment");
+
+        // Button that closes this form.
+        JButton backButton = new JButton("Back");
+
+        completeButton.setBackground(new Color(60, 160, 90));
+        completeButton.setForeground(Color.WHITE);
+        completeButton.setFocusPainted(false);
+
+        cancelButton.setBackground(new Color(220, 80, 80));
+        cancelButton.setForeground(Color.WHITE);
+        cancelButton.setFocusPainted(false);
+
+        // Panel displayed at the bottom for appointment action buttons.
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 20));
+        buttonPanel.add(completeButton);
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(backButton);
+
         add(topPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
 
         searchButton.addActionListener(event -> searchAppointments());
-        cancelButton.addActionListener(event -> cancelAppointment());
+        patientIdField.addActionListener(event -> searchAppointments());
+        completeButton.addActionListener(event -> updateSelectedAppointment(Appointment.STATUS_COMPLETED));
+        cancelButton.addActionListener(event -> updateSelectedAppointment(Appointment.STATUS_CANCELLED));
+        backButton.addActionListener(event -> dispose());
 
         setVisible(true);
     }
@@ -109,7 +135,11 @@ public class PatientHistoryForm extends JFrame {
             return;
         }
 
-        // Clear old rows before showing new results.
+        loadPatientAppointments(patientId, true);
+    }
+
+    // Loads appointment rows for the entered patient ID.
+    private void loadPatientAppointments(int patientId, boolean showEmptyMessage) {
         tableModel.setRowCount(0);
 
         boolean found = false;
@@ -120,6 +150,7 @@ public class PatientHistoryForm extends JFrame {
             if (appointment.getPatientId() == patientId) {
 
                 Object[] row = {
+                    appointment.getAppointmentId(),
                     appointment.getPatientId(),
                     appointment.getDoctorName(),
                     appointment.getDate(),
@@ -134,7 +165,7 @@ public class PatientHistoryForm extends JFrame {
         }
 
         // If no appointments were found.
-        if (!found) {
+        if (!found && showEmptyMessage) {
 
             JOptionPane.showMessageDialog(
                 this,
@@ -143,8 +174,8 @@ public class PatientHistoryForm extends JFrame {
         }
     }
 
-    // Cancels the appointment selected in the table.
-    private void cancelAppointment() {
+    // Updates the selected appointment status and refreshes the table.
+    private void updateSelectedAppointment(String newStatus) {
 
         int selectedRow = appointmentTable.getSelectedRow();
 
@@ -159,52 +190,48 @@ public class PatientHistoryForm extends JFrame {
             return;
         }
 
-        // Get selected appointment data.
-        int patientId = Integer.parseInt(
-            tableModel.getValueAt(selectedRow, 0).toString()
-        );
+        int appointmentId = Integer.parseInt(tableModel.getValueAt(selectedRow, 0).toString());
+        Appointment appointment = DataStore.findAppointmentById(appointmentId);
 
-        String doctorName =
-            tableModel.getValueAt(selectedRow, 1).toString();
-
-        String date =
-            tableModel.getValueAt(selectedRow, 2).toString();
-
-        String time =
-            tableModel.getValueAt(selectedRow, 3).toString();
-
-        try {
-
-            // Find matching appointment.
-            for (Appointment appointment : DataStore.appointments) {
-
-                if (appointment.getPatientId() == patientId
-                    && appointment.getDoctorName().equals(doctorName)
-                    && appointment.getDate().equals(date)
-                    && appointment.getTime().equals(time)) {
-
-                    // Change status to Cancelled.
-                    appointment.setStatus(Appointment.STATUS_CANCELLED);
-                    DataStore.saveData();
-
-                    JOptionPane.showMessageDialog(
-                        this,
-                        "Appointment cancelled"
-                    );
-
-                    // Refresh table.
-                    searchAppointments();
-
-                    return;
-                }
-            }
-
-        } catch (Exception exception) {
-
+        if (appointment == null) {
             JOptionPane.showMessageDialog(
                 this,
-                "Something went wrong"
+                "Appointment could not be found.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
             );
+            return;
         }
+
+        if (appointment.getStatus().equals(newStatus)) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Appointment is already " + newStatus + ".",
+                "No Change",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+            return;
+        }
+
+        if (!appointment.getStatus().equals(Appointment.STATUS_SCHEDULED)) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Only Scheduled appointments can be updated.",
+                "Invalid Action",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        appointment.setStatus(newStatus);
+        DataStore.saveData();
+        loadPatientAppointments(appointment.getPatientId(), false);
+
+        JOptionPane.showMessageDialog(
+            this,
+            "Appointment marked as " + newStatus + ".",
+            "Updated",
+            JOptionPane.INFORMATION_MESSAGE
+        );
     }
 }
