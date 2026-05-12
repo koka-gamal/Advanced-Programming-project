@@ -1,74 +1,113 @@
-# Project Lifecycle
+# Project Lifecycle And Class Functions
 
-This document explains how the Clinic Appointment System should be built,
-tested, integrated, and finalized.
+## Overview
 
-## 1. Requirements
+The Clinic Appointment System is a Java Swing desktop application. It manages
+patients, doctors, and clinic appointments using model classes, shared lists,
+and GUI forms.
 
-The system is a Java Swing GUI application for basic clinic appointment
-management. The required user actions are:
+## Application Lifecycle
 
-- Add a patient.
-- Book an appointment for an existing patient ID.
-- View appointments for a selected doctor.
-- Search a patient's appointment history.
-- Cancel a scheduled appointment.
+1. The program starts from `clinic.app.Main`.
+2. `MainMenuForm` opens and displays the main navigation buttons.
+3. The user adds patients through `AddPatientForm`.
+4. The user books appointments through `BookAppointmentForm`.
+5. Appointment data is stored in `DataStore.appointments`.
+6. The user views appointments by doctor through `ViewAppointmentsForm`.
+7. The user searches patient history through `PatientHistoryForm`.
+8. The user can cancel appointments from the patient history screen.
+9. `DataStore.saveData()` stores patient and appointment records in text files.
 
-## 2. Design
+## Validation Lifecycle
 
-The project follows a simple object-oriented structure:
+1. GUI forms collect user input from text fields, combo boxes, and tables.
+2. Empty fields are checked before data is used.
+3. Numeric values are parsed inside `try-catch` blocks.
+4. Patient IDs are checked before appointments are booked.
+5. Error messages are shown with `JOptionPane`.
+6. Valid actions update the shared lists in `DataStore`.
 
-- Model classes store data only.
-- `DataStore` holds shared `ArrayList`s.
-- GUI forms read from and write to `DataStore`.
-- Each form validates user input before changing shared data.
+## Class Function Summary
 
-This matches the UML design: the main menu opens forms, forms use `DataStore`,
-and appointments connect patients to doctors through patient IDs and doctor
-names.
+### `clinic.app.Main`
 
-## 3. Implementation Order
+- `main(String[] args)`: Starts the Swing application and opens the main menu.
 
-1. Create model classes: `Patient`, `Doctor`, and `Appointment`.
-2. Create `DataStore` with shared lists and predefined doctors.
-3. Build `MainMenuForm` to open each feature screen.
-4. Build `AddPatientForm` and validate patient input.
-5. Build `BookAppointmentForm` and validate existing patient IDs.
-6. Build `ViewAppointmentsForm` and filter appointments by doctor.
-7. Build `PatientHistoryForm` and support appointment cancellation.
-8. Test each form separately.
-9. Merge teammate files and resolve package/import differences.
-10. Run final compile and GUI testing.
+### `clinic.data.DataStore`
 
-## 4. Validation Rules
+- `loadDefaultDoctors()`: Adds the fixed doctors used by the system.
+- `saveData()`: Saves patient and appointment data.
+- `savePatients()`: Writes patient records to `patients.txt`.
+- `saveAppointments()`: Writes appointment records to `appointments.txt`.
+- `loadData()`: Loads saved patient and appointment records.
+- `loadPatients()`: Reads patients from `patients.txt`.
+- `loadAppointments()`: Reads appointments from `appointments.txt`.
+- `findPatientById(int id)`: Finds a patient by ID.
+- `getAppointmentsByDoctor(String doctorName)`: Returns appointments for one doctor.
+- `getAppointmentsByPatient(int patientId)`: Returns appointments for one patient.
+- `findAppointmentById(int appointmentId)`: Finds an appointment by ID.
 
-Every form should prevent common user mistakes:
+### `clinic.model.Patient`
 
-- Empty required fields are rejected.
-- Numeric fields are parsed inside `try-catch` blocks.
-- Patient IDs are checked with `DataStore.findPatientById`.
-- Missing or invalid selections show `JOptionPane` messages.
-- Runtime errors should not close the application unexpectedly.
+- `Patient(int id, String name, int age, String contact)`: Creates a patient record.
+- `toString()`: Returns a short patient label.
 
-## 5. Testing Flow
+### `clinic.model.Doctor`
 
-Use this manual test path after every integration:
+- `Doctor(int id, String name, String specialization)`: Creates a doctor record.
+- `toString()`: Returns the doctor name for combo boxes.
 
-1. Start the app from `clinic.app.Main`.
-2. Add a patient and record the generated patient ID.
-3. Search for the patient to confirm the record exists.
-4. Book an appointment using that patient ID.
-5. View appointments for the selected doctor.
-6. Open patient history and search by patient ID.
-7. Cancel the appointment.
-8. Search the same patient again and confirm the status is `Cancelled`.
+### `clinic.model.Appointment`
 
-## 6. Final Delivery
+- `Appointment(int appointmentId, int patientId, String doctorName, String date, String time)`: Creates a scheduled appointment.
+- `toString()`: Returns a readable appointment summary.
 
-Before submitting the project:
+### `clinic.ui.MainMenuForm`
 
-- Confirm all Java files compile from the project root.
-- Confirm the GUI opens without console errors.
-- Keep screenshots of each required screen.
-- Keep teammate code comments readable and consistent.
-- Do not add extra features during final integration unless the team agrees.
+- `MainMenuForm()`: Builds the main menu screen.
+- `createButton(String text)`: Creates a styled menu button.
+- `confirmExit()`: Confirms before closing the application.
+
+### `clinic.ui.AddPatientForm`
+
+- `AddPatientForm()`: Builds the add patient screen.
+- `addPatient()`: Validates and saves a patient.
+- `clearForm()`: Clears the patient input fields.
+
+### `clinic.ui.BookAppointmentForm`
+
+- `BookAppointmentForm()`: Builds the appointment booking screen.
+- `stripTime(Date date)`: Removes time values from a date.
+- `generateTimeSlots()`: Creates available appointment times.
+- `bookAppointment()`: Validates and saves an appointment.
+- `resetForm()`: Clears booking input after saving.
+
+### `clinic.ui.SearchPatientForm`
+
+- `SearchPatientForm()`: Builds the patient search screen.
+- `search()`: Searches patients by name or contact.
+- `matchesSearch(Patient patient, String keyword)`: Checks whether a patient matches the search.
+- `showSearchResults(ArrayList<Patient> matches)`: Displays matching patients in the table.
+- `clearSearch()`: Clears the search field and table.
+
+### `clinic.ui.ViewAppointmentsForm`
+
+- `ViewAppointmentsForm()`: Builds the doctor appointments screen.
+- `loadAppointments()`: Loads appointments for the selected doctor.
+
+### `clinic.ui.PatientHistoryForm`
+
+- `PatientHistoryForm()`: Builds the patient history screen.
+- `searchAppointments()`: Searches appointments by patient ID.
+- `cancelAppointment()`: Changes the selected appointment status to `Cancelled`.
+
+## Final Testing Checklist
+
+- The project compiles successfully.
+- The main menu opens from `clinic.app.Main`.
+- Each GUI page opens at `1000x800`.
+- Patient creation validates empty fields and age input.
+- Appointment booking validates patient ID input.
+- Doctor appointments display in a table.
+- Patient history displays in a table.
+- Appointment cancellation updates the appointment status.

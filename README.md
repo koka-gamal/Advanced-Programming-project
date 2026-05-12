@@ -1,16 +1,16 @@
 # Clinic Appointment System
 
-A simplified Java Swing application for managing clinic patients and appointments.
+A Java Swing application for managing clinic patients and appointments.
 
-The system lets users add patients, book appointments with predefined doctors,
-view appointments by doctor, search patient history, and cancel scheduled
-appointments. The project is intentionally lightweight: shared data is held in
-`ArrayList`s inside `DataStore`, with a small text-file backup for local testing.
+The system supports adding patients, booking appointments with predefined
+doctors, viewing appointments by doctor, searching patient history, and
+cancelling appointments.
 
 ## Project Structure
 
 ```text
 Clinic Appointment System
+|-- run_project.bat
 |-- src/
 |   `-- clinic/
 |       |-- app/
@@ -32,51 +32,42 @@ Clinic Appointment System
 |   |-- appointments.txt
 |   `-- patients.txt
 |-- docs/
-|   |-- INTEGRATION_GUIDE.md
 |   `-- PROJECT_LIFECYCLE.md
 `-- build/
     `-- classes/
 ```
 
-## Main Parts
+## How To Run
 
-`clinic.app.Main` starts the application and opens the main menu.
+Double-click:
 
-`clinic.data.DataStore` is the shared storage layer. It owns the public static
-lists for patients, doctors, and appointments, plus helper search methods used
-by the GUI screens.
+```text
+run_project.bat
+```
 
-`clinic.model` contains the simple object classes:
+The batch file compiles the source files, then starts the application.
 
-- `Patient`: patient ID, name, age, and contact.
-- `Doctor`: predefined doctor ID, name, and specialization.
-- `Appointment`: appointment ID, patient ID, doctor name, date, time, and status.
+Manual commands:
 
-`clinic.ui` contains all Swing windows:
-
-- `MainMenuForm`: opens the other screens.
-- `AddPatientForm`: validates and stores new patients.
-- `BookAppointmentForm`: validates patient ID and books appointments.
-- `ViewAppointmentsForm`: filters appointments by doctor.
-- `PatientHistoryForm`: searches patient appointments and cancels scheduled ones.
-- `SearchPatientForm`: optional helper for finding patient IDs.
-
-## Compile And Run
-
-From the project root:
-
-```powershell
-javac -d build\classes (Get-ChildItem -Recurse src -Filter *.java).FullName
+```cmd
+javac -d build\classes src\clinic\app\Main.java src\clinic\data\DataStore.java src\clinic\model\*.java src\clinic\ui\*.java
 java -cp build\classes clinic.app.Main
 ```
+
+## Main Features
+
+- Add a new patient with name, age, and contact.
+- Search patients by name or contact.
+- Book an appointment using an existing patient ID.
+- View appointments for a selected doctor.
+- Search appointment history by patient ID.
+- Cancel an appointment by changing its status to `Cancelled`.
 
 ## Data Rules
 
 - Patients are stored in `DataStore.patients`.
-- Doctors are predefined in `DataStore.doctors`.
+- Doctors are stored in `DataStore.doctors`.
 - Appointments are stored in `DataStore.appointments`.
 - New appointments start with status `Scheduled`.
-- Cancelled appointments change status to `Cancelled`.
-
-The `data/` text files are only a simple local backup. They are not a database,
-and they can be cleared during testing if the team wants a fresh run.
+- Cancelled appointments use status `Cancelled`.
+- Text files in `data/` store records between runs.

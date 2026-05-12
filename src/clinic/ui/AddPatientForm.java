@@ -1,49 +1,41 @@
 package clinic.ui;
 
-import clinic.data.DataStore;
-import clinic.model.Patient;
+import clinic.data.*;
+import clinic.model.*;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
+import javax.swing.*;
+import java.awt.*;
 
-/**
- * Form used to register a new patient in the shared DataStore.
- */
+// Screen used to register a new patient.
 public class AddPatientForm extends JFrame {
     private JTextField txtName;
     private JTextField txtAge;
     private JTextField txtContact;
 
-    /**
-     * Builds the add-patient window and connects its buttons.
-     */
+    // Builds the add patient form and its controls.
     public AddPatientForm() {
         setTitle("Add New Patient");
-        setSize(400, 300);
+        setSize(1000, 800);
         setLocationRelativeTo(null);
         setResizable(false);
 
+        // Title label displayed at the top of the form.
         JLabel title = new JLabel("Add New Patient", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-        title.setBorder(BorderFactory.createEmptyBorder(15, 0, 10, 0));
+        title.setFont(new Font("Arial", Font.BOLD, 28));
+        title.setBorder(BorderFactory.createEmptyBorder(60, 0, 30, 0));
 
+        // Text field displayed beside the Full Name label.
         txtName = new JTextField();
+
+        // Text field displayed beside the Age label.
         txtAge = new JTextField();
+
+        // Text field displayed beside the Contact label.
         txtContact = new JTextField();
 
-        JPanel formPanel = new JPanel(new GridLayout(3, 2, 10, 10));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(10, 40, 10, 40));
+        // Label and input area displayed in the center of the screen.
+        JPanel formPanel = new JPanel(new GridLayout(3, 2, 20, 25));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(80, 250, 80, 250));
         formPanel.add(new JLabel("Full Name:"));
         formPanel.add(txtName);
         formPanel.add(new JLabel("Age:"));
@@ -51,15 +43,21 @@ public class AddPatientForm extends JFrame {
         formPanel.add(new JLabel("Contact:"));
         formPanel.add(txtContact);
 
+        // Button that saves the patient.
         JButton btnAdd = new JButton("Add Patient");
+
+        // Button that clears the text fields.
         JButton btnClear = new JButton("Clear");
+
+        // Button that closes this form.
         JButton btnBack = new JButton("Back");
 
         btnAdd.setBackground(new Color(60, 160, 90));
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setFocusPainted(false);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        // Panel displayed at the bottom for form buttons.
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 20));
         buttonPanel.add(btnAdd);
         buttonPanel.add(btnClear);
         buttonPanel.add(btnBack);
@@ -74,9 +72,7 @@ public class AddPatientForm extends JFrame {
         btnBack.addActionListener(event -> dispose());
     }
 
-    /**
-     * Validates the entered patient details and stores the patient.
-     */
+    // Validates the entered patient details and stores the patient.
     private void addPatient() {
         String name = txtName.getText().trim();
         String ageText = txtAge.getText().trim();
@@ -123,9 +119,7 @@ public class AddPatientForm extends JFrame {
         clearForm();
     }
 
-    /**
-     * Clears all text fields after saving or when the user presses Clear.
-     */
+    // Clears the form after saving or when the Clear button is pressed.
     private void clearForm() {
         txtName.setText("");
         txtAge.setText("");

@@ -1,54 +1,49 @@
 package clinic.ui;
 
-import clinic.data.DataStore;
-import clinic.model.Appointment;
+import clinic.data.*;
+import clinic.model.*;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.table.DefaultTableModel;
-import java.awt.BorderLayout;
+import javax.swing.*;
+import javax.swing.table.*;
+import java.awt.*;
 
-/**
- * Screen used to search a patient's appointment history and cancel appointments.
- */
+// Screen used to search patient appointment history and cancel appointments.
 public class PatientHistoryForm extends JFrame {
 
-    // Input field for patient ID.
+    // Input field displayed beside the Patient ID label.
     private JTextField patientIdField;
 
-    // Action buttons for searching and cancelling.
+    // Button displayed in the top panel to search appointments.
     private JButton searchButton;
+
+    // Button displayed in the top panel to cancel the selected appointment.
     private JButton cancelButton;
 
-    // Table components used to display appointment results.
+    // Table displayed in the center of the screen.
     private JTable appointmentTable;
     private DefaultTableModel tableModel;
 
-    /**
-     * Builds the patient history window, search controls, and appointment table.
-     */
+    // Builds the patient history window, search controls, and appointment table.
     public PatientHistoryForm() {
 
         // Window setup.
         setTitle("Patient History");
-        setSize(700, 400);
+        setSize(1000, 800);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // Top panel.
-        JPanel topPanel = new JPanel();
+        // Top panel displayed above the appointment table.
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 30));
 
+        // Label displayed before the patient ID field.
         JLabel patientIdLabel = new JLabel("Patient ID:");
 
         patientIdField = new JTextField(15);
 
+        // Button displayed beside the patient ID field.
         searchButton = new JButton("Search");
+
+        // Button displayed beside the search button.
         cancelButton = new JButton("Cancel Appointment");
 
         topPanel.add(patientIdLabel);
@@ -56,7 +51,7 @@ public class PatientHistoryForm extends JFrame {
         topPanel.add(searchButton);
         topPanel.add(cancelButton);
 
-        // Table columns.
+        // Table columns displayed in the appointment results table.
         String[] columns = {
             "Patient ID",
             "Doctor",
@@ -69,23 +64,19 @@ public class PatientHistoryForm extends JFrame {
 
         appointmentTable = new JTable(tableModel);
 
+        // Scroll pane displayed around the appointment table.
         JScrollPane scrollPane = new JScrollPane(appointmentTable);
 
-        // Add components to frame.
         add(topPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Button actions.
         searchButton.addActionListener(event -> searchAppointments());
-
         cancelButton.addActionListener(event -> cancelAppointment());
 
         setVisible(true);
     }
 
-    /**
-     * Searches appointments using the patient ID entered by the user.
-     */
+    // Searches appointments using the patient ID entered by the user.
     private void searchAppointments() {
 
         String input = patientIdField.getText().trim();
@@ -152,9 +143,7 @@ public class PatientHistoryForm extends JFrame {
         }
     }
 
-    /**
-     * Cancels the appointment selected in the table.
-     */
+    // Cancels the appointment selected in the table.
     private void cancelAppointment() {
 
         int selectedRow = appointmentTable.getSelectedRow();
@@ -194,7 +183,7 @@ public class PatientHistoryForm extends JFrame {
                     && appointment.getDate().equals(date)
                     && appointment.getTime().equals(time)) {
 
-                    // Change status to cancelled.
+                    // Change status to Cancelled.
                     appointment.setStatus(Appointment.STATUS_CANCELLED);
                     DataStore.saveData();
 

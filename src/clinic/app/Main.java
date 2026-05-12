@@ -1,17 +1,13 @@
 package clinic.app;
 
-import clinic.ui.MainMenuForm;
+import clinic.ui.*;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
-/**
- * Program entry point for the Clinic Appointment System.
- */
+// Starts the Clinic Appointment System.
 public class Main {
 
-    /**
-     * Starts the Swing application on the Event Dispatch Thread.
-     */
+    // Opens the main menu on the Swing event thread.
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new MainMenuForm().setVisible(true));
     }

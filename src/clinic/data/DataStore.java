@@ -1,24 +1,11 @@
 package clinic.data;
 
-import clinic.model.Appointment;
-import clinic.model.Doctor;
-import clinic.model.Patient;
+import clinic.model.*;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.io.*;
+import java.util.*;
 
-/**
- * Central shared storage for the whole Clinic Appointment System.
- *
- * All GUI forms read from and write to these public static lists. This keeps
- * integration simple for the team because every screen uses the same patients,
- * doctors, and appointments.
- */
+// Central shared storage for patients, doctors, and appointments.
 public class DataStore {
     public static ArrayList<Patient> patients = new ArrayList<>();
     public static ArrayList<Appointment> appointments = new ArrayList<>();
@@ -36,18 +23,10 @@ public class DataStore {
         loadData();
     }
 
-    /**
-     * Private constructor prevents accidental DataStore objects.
-     *
-     * DataStore is meant to be used through its static shared lists and helper
-     * methods only.
-     */
     private DataStore() {
     }
 
-    /**
-     * Creates the predefined doctors used by the booking and viewing forms.
-     */
+    // Adds the fixed list of doctors available in the system.
     private static void loadDefaultDoctors() {
         doctors.add(new Doctor(1, "Dr. Ahmed Hassan", "Cardiology"));
         doctors.add(new Doctor(2, "Dr. Sara Mohamed", "Dermatology"));
@@ -56,25 +35,18 @@ public class DataStore {
         doctors.add(new Doctor(5, "Dr. Omar Farouk", "General Practice"));
     }
 
-    /**
-     * Saves patients and appointments to simple text files.
-     *
-     * The project still works through ArrayLists while it runs. These files are
-     * only a lightweight backup so test data can survive closing the app.
-     */
+    // Saves patient and appointment records to simple text files.
     public static void saveData() {
         try {
             new File(DATA_DIR).mkdirs();
             savePatients();
             saveAppointments();
-        } catch (IOException e) {
-            System.err.println("Error saving data: " + e.getMessage());
+        } catch (IOException exception) {
+            System.err.println("Error saving data: " + exception.getMessage());
         }
     }
 
-    /**
-     * Writes patient records using a simple pipe-separated text format.
-     */
+    // Writes patient rows to the patients text file.
     private static void savePatients() throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(PATIENTS_FILE))) {
             writer.write("nextId=" + nextPatientId);
@@ -88,9 +60,7 @@ public class DataStore {
         }
     }
 
-    /**
-     * Writes appointment records using a simple pipe-separated text format.
-     */
+    // Writes appointment rows to the appointments text file.
     private static void saveAppointments() throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(APPOINTMENTS_FILE))) {
             writer.write("nextId=" + nextAppointmentId);
@@ -105,9 +75,7 @@ public class DataStore {
         }
     }
 
-    /**
-     * Loads any saved patient and appointment data when the app starts.
-     */
+    // Loads saved records when the application starts.
     public static void loadData() {
         patients.clear();
         appointments.clear();
@@ -118,9 +86,7 @@ public class DataStore {
         loadAppointments();
     }
 
-    /**
-     * Reads patients from the text file if it exists.
-     */
+    // Reads patient records from the patients text file.
     private static void loadPatients() {
         File patientFile = new File(PATIENTS_FILE);
         if (!patientFile.exists()) {
@@ -144,14 +110,12 @@ public class DataStore {
                     ));
                 }
             }
-        } catch (IOException | NumberFormatException e) {
-            System.err.println("Error loading patients: " + e.getMessage());
+        } catch (IOException | NumberFormatException exception) {
+            System.err.println("Error loading patients: " + exception.getMessage());
         }
     }
 
-    /**
-     * Reads appointments from the text file if it exists.
-     */
+    // Reads appointment records from the appointments text file.
     private static void loadAppointments() {
         File appointmentFile = new File(APPOINTMENTS_FILE);
         if (!appointmentFile.exists()) {
@@ -178,17 +142,12 @@ public class DataStore {
                     appointments.add(appointment);
                 }
             }
-        } catch (IOException | NumberFormatException e) {
-            System.err.println("Error loading appointments: " + e.getMessage());
+        } catch (IOException | NumberFormatException exception) {
+            System.err.println("Error loading appointments: " + exception.getMessage());
         }
     }
 
-    /**
-     * Finds a patient by ID.
-     *
-     * Returns null when no patient matches, so forms can show a friendly error
-     * instead of crashing.
-     */
+    // Finds a patient by ID and returns null when no match exists.
     public static Patient findPatientById(int id) {
         for (Patient patient : patients) {
             if (patient.getId() == id) {
@@ -198,9 +157,7 @@ public class DataStore {
         return null;
     }
 
-    /**
-     * Returns all appointments for the selected doctor name.
-     */
+    // Returns all appointments for one doctor.
     public static ArrayList<Appointment> getAppointmentsByDoctor(String doctorName) {
         ArrayList<Appointment> result = new ArrayList<>();
 
@@ -213,9 +170,7 @@ public class DataStore {
         return result;
     }
 
-    /**
-     * Returns all appointments connected to a patient ID.
-     */
+    // Returns all appointments for one patient.
     public static ArrayList<Appointment> getAppointmentsByPatient(int patientId) {
         ArrayList<Appointment> result = new ArrayList<>();
 
@@ -228,12 +183,7 @@ public class DataStore {
         return result;
     }
 
-    /**
-     * Finds an appointment by ID.
-     *
-     * This helper is used by cancellation logic so the table row can be matched
-     * back to the real appointment object.
-     */
+    // Finds an appointment by ID and returns null when no match exists.
     public static Appointment findAppointmentById(int appointmentId) {
         for (Appointment appointment : appointments) {
             if (appointment.getAppointmentId() == appointmentId) {

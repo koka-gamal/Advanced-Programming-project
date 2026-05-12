@@ -1,53 +1,36 @@
 package clinic.ui;
 
-import clinic.data.DataStore;
-import clinic.model.Appointment;
-import clinic.model.Doctor;
-import clinic.model.Patient;
+import clinic.data.*;
+import clinic.model.*;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerDateModel;
-import javax.swing.SwingConstants;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import javax.swing.*;
+import java.awt.*;
+import java.text.*;
+import java.util.*;
 
-/**
- * Form used to book a patient appointment with a predefined doctor.
- */
+// Screen used to book an appointment for an existing patient.
 public class BookAppointmentForm extends JFrame {
     private JTextField txtPatientId;
     private JComboBox<Doctor> cmbDoctor;
     private JSpinner dateSpinner;
     private JComboBox<String> cmbTime;
 
-    /**
-     * Builds the booking screen and prepares the doctor/date/time controls.
-     */
+    // Builds the appointment booking form and its controls.
     public BookAppointmentForm() {
         setTitle("Book Appointment");
-        setSize(440, 350);
+        setSize(1000, 800);
         setLocationRelativeTo(null);
         setResizable(false);
 
+        // Title label displayed at the top of the booking form.
         JLabel title = new JLabel("Book an Appointment", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-        title.setBorder(BorderFactory.createEmptyBorder(15, 0, 10, 0));
+        title.setFont(new Font("Arial", Font.BOLD, 28));
+        title.setBorder(BorderFactory.createEmptyBorder(60, 0, 30, 0));
 
+        // Text field displayed beside the Patient ID label.
         txtPatientId = new JTextField();
+
+        // Doctor dropdown displayed beside the Doctor label.
         cmbDoctor = new JComboBox<>();
         for (Doctor doctor : DataStore.doctors) {
             cmbDoctor.addItem(doctor);
@@ -60,13 +43,17 @@ public class BookAppointmentForm extends JFrame {
             null,
             Calendar.DAY_OF_MONTH
         );
+
+        // Date picker displayed beside the Date label.
         dateSpinner = new JSpinner(dateModel);
         dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "dd/MM/yyyy"));
 
+        // Time dropdown displayed beside the Time label.
         cmbTime = new JComboBox<>(generateTimeSlots());
 
-        JPanel formPanel = new JPanel(new GridLayout(4, 2, 10, 12));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(10, 40, 10, 40));
+        // Label and input area displayed in the center of the screen.
+        JPanel formPanel = new JPanel(new GridLayout(4, 2, 20, 25));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(70, 250, 70, 250));
         formPanel.add(new JLabel("Patient ID:"));
         formPanel.add(txtPatientId);
         formPanel.add(new JLabel("Doctor:"));
@@ -76,14 +63,18 @@ public class BookAppointmentForm extends JFrame {
         formPanel.add(new JLabel("Time:"));
         formPanel.add(cmbTime);
 
+        // Button that books the appointment.
         JButton btnBook = new JButton("Book Appointment");
+
+        // Button that closes this form.
         JButton btnBack = new JButton("Back");
 
         btnBook.setBackground(new Color(60, 120, 200));
         btnBook.setForeground(Color.WHITE);
         btnBook.setFocusPainted(false);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 8));
+        // Panel displayed at the bottom for form buttons.
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 20));
         buttonPanel.add(btnBook);
         buttonPanel.add(btnBack);
 
@@ -96,12 +87,7 @@ public class BookAppointmentForm extends JFrame {
         btnBack.addActionListener(event -> dispose());
     }
 
-    /**
-     * Removes hours, minutes, and seconds from a date.
-     *
-     * The date spinner uses this so the minimum date compares only by calendar
-     * day, not by the current time of day.
-     */
+    // Removes hours, minutes, and seconds so date checks compare by day.
     private Date stripTime(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -112,11 +98,9 @@ public class BookAppointmentForm extends JFrame {
         return calendar.getTime();
     }
 
-    /**
-     * Creates 30-minute appointment slots from 8:00 AM to 7:30 PM.
-     */
+    // Creates 30-minute appointment slots from 8:00 AM to 7:30 PM.
     private String[] generateTimeSlots() {
-        java.util.List<String> slots = new java.util.ArrayList<>();
+        ArrayList<String> slots = new ArrayList<>();
 
         for (int hour = 8; hour < 20; hour++) {
             int displayHour = hour > 12 ? hour - 12 : hour;
@@ -129,9 +113,7 @@ public class BookAppointmentForm extends JFrame {
         return slots.toArray(new String[0]);
     }
 
-    /**
-     * Validates the form, checks the patient exists, and saves the appointment.
-     */
+    // Validates the form, checks the patient exists, and saves the appointment.
     private void bookAppointment() {
         String patientIdText = txtPatientId.getText().trim();
 
@@ -210,9 +192,7 @@ public class BookAppointmentForm extends JFrame {
         resetForm();
     }
 
-    /**
-     * Resets the booking controls after a successful booking.
-     */
+    // Resets the booking fields after a successful booking.
     private void resetForm() {
         txtPatientId.setText("");
         dateSpinner.setValue(stripTime(new Date()));
