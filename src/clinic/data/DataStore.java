@@ -13,7 +13,7 @@ public class DataStore {
 
     public static int nextPatientId = 1;
     public static int nextAppointmentId = 1;
-    public static int nextDoctorId = 6;
+    public static int nextDoctorId = 1;
 
     private static final String DATA_DIR = "data";
     private static final String PATIENTS_FILE = DATA_DIR + "/patients.txt";
@@ -98,7 +98,7 @@ public class DataStore {
         appointments.clear();
         nextPatientId = 1;
         nextAppointmentId = 1;
-        nextDoctorId = 6;
+        nextDoctorId = 1;
 
         loadDoctors();
         loadPatients();
